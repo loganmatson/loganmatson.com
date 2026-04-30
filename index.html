@@ -589,6 +589,37 @@
 
   /* Card 5 contact emphasis */
   .card.contact h2 { font-size: 38px; }
+
+  /* Top-right CTA cluster (Cards 1, 3, 4) */
+  .card-ctas {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+    z-index: 5;
+    max-width: 60%;
+  }
+  .card-ctas .cta {
+    font-size: 12px;
+    padding: 6px 12px;
+    background: rgba(74, 124, 89, 0.18);
+    border: 1px solid rgba(111, 166, 126, 0.4);
+    border-radius: 999px;
+    color: #fff;
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+  .card-ctas .cta:hover {
+    background: rgba(74, 124, 89, 0.35);
+    border-color: var(--sage-bright);
+    color: #fff;
+  }
+  .card-ctas .cta .arrow { font-size: 13px; }
+  /* Eyebrow + h2 on cards with CTA cluster need right padding so headline doesn't underlap pills */
+  .card:has(.card-ctas) .card-eyebrow,
+  .card:has(.card-ctas) h2 { padding-right: 240px; }
   .cta-underline {
     text-decoration: underline;
     text-decoration-color: rgba(111, 166, 126, 0.6);
@@ -780,6 +811,17 @@
 
   <!-- Card 1 — A Real Impact -->
   <article class="card" id="card-1" data-in="0.20" data-out="0.32">
+    <div class="card-ctas">
+      <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
+        <span class="arrow">→</span> Demo
+      </a>
+      <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
+        <span class="arrow">→</span> Validator
+      </a>
+      <a class="cta" href="https://github.com/loganmatson/health-agent-ecosystem" target="_blank" rel="noopener">
+        <span class="arrow">→</span> GitHub
+      </a>
+    </div>
     <div class="card-eyebrow">01 — Case Study</div>
     <h2>A Real Impact</h2>
     <p class="subhead"><strong>8 Years of Epilepsy and Invasive Neurosurgery —</strong> now my health is driven by an autonomous system that plans, tracks, and self-corrects.</p>
@@ -835,27 +877,11 @@
     </div>
 
     <div class="tab-panel" id="p1-demo">
-      <p class="dense">Interactive map of the agent network — circular SVG flow, expandable role panels, animated handoffs between subagents. Built to show how the system thinks before it acts.</p>
-      <div class="cta-row">
-        <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
-          <span class="arrow">→</span> Open Demo
-        </a>
-      </div>
+      <p class="dense">Interactive map of the agent network: circular SVG flow, expandable role panels, animated handoffs between subagents. Built to show how the system thinks before it acts. Open the <strong>Demo</strong> link above.</p>
     </div>
 
     <div class="tab-panel" id="p1-validator">
-      <p class="dense">Monthly retrospective validator: every forecast (training load, recovery, seizure risk, meal-recovery correlation) is checked against the next month's real biometric data. Drift gets pushed back into <em>agent-weights.json</em> so the system gets smarter on its own.</p>
-      <div class="cta-row">
-        <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
-          <span class="arrow">→</span> View Dashboard
-        </a>
-      </div>
-    </div>
-
-    <div class="cta-row" style="margin-top: 6px;">
-      <a class="cta" href="https://github.com/loganmatson/health-agent-ecosystem" target="_blank" rel="noopener">
-        <span class="arrow">→</span> GitHub
-      </a>
+      <p class="dense">Monthly retrospective validator: every forecast (training load, recovery, seizure risk, meal-recovery correlation) is checked against the next month's real biometric data. Drift gets pushed back into <em>agent-weights.json</em> so the system gets smarter on its own. Open the <strong>Validator</strong> link above.</p>
     </div>
   </article>
 
@@ -895,6 +921,11 @@
 
   <!-- Card 3 — How I Can Help -->
   <article class="card" id="card-3" data-in="0.52" data-out="0.64">
+    <div class="card-ctas">
+      <a class="cta" href="mailto:lpmats09@gmail.com?subject=Let's%20Talk">
+        <span class="arrow">→</span> Let's Talk
+      </a>
+    </div>
     <div class="card-eyebrow">03 — Working Together</div>
     <h2>What I Do For You</h2>
 
@@ -917,15 +948,15 @@
       </div>
     </div>
 
-    <div class="cta-row">
-      <a class="cta" href="mailto:lpmats09@gmail.com?subject=Let's%20Talk">
-        <span class="arrow">→</span> Let's Talk
-      </a>
-    </div>
   </article>
 
   <!-- Card 4 — More Builds -->
   <article class="card" id="card-4" data-in="0.68" data-out="0.80">
+    <div class="card-ctas">
+      <a class="cta" href="https://github.com/loganmatson" target="_blank" rel="noopener">
+        <span class="arrow">→</span> View All on GitHub
+      </a>
+    </div>
     <div class="card-eyebrow">04 — More Builds</div>
     <h2>In Production</h2>
     <div class="proj-list">
@@ -987,11 +1018,6 @@
         <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links, all in one HTML file.<span class="takeaway">Same pattern works for any complex personal logistics, not just travel.</span></span>
       </a>
 
-    </div>
-    <div class="cta-row">
-      <a class="cta" href="https://github.com/loganmatson" target="_blank" rel="noopener">
-        <span class="arrow">→</span> View All on GitHub
-      </a>
     </div>
   </article>
 
