@@ -1,0 +1,1219 @@
+<!--
+  =============================================================
+  Logan Matson — Personal Portfolio Site (v2)
+  -------------------------------------------------------------
+  Single file · 0 frameworks · ~700 lines vanilla JS + CSS
+  Cinematic scroll-driven fly-through · 5 frosted-glass cards
+  3D mouse tilt · spotlight glow · magnetic CTAs · ambient float
+  Built with Claude Code · Apr 2026
+  SPEC: Personal/Career/Personal Website/SPEC.md
+  -------------------------------------------------------------
+  Scroll drives video.currentTime · cards lifecycle on data-in/out
+  Right-side jump nav · live highlight on active card
+  Mobile fallback at <=768px (no video, stacked cards)
+  =============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Logan Matson — The future of work, built by hand.</title>
+<meta name="description" content="AI systems. Automation pipelines. Tools that run while you sleep." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sage: #4A7C59;
+    --sage-bright: #6FA67E;
+    --white: #FFFFFF;
+    --white-2: #E8E8E8;
+    --wood-1: #6b4a2b;
+    --wood-2: #8c6135;
+    --wood-3: #4a3220;
+  }
+  html, body {
+    background: #0a0a0a;
+    color: var(--white);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  /* scroll-behavior: smooth conflicts with scroll-scrubbing — never use it */
+
+  .scroll-container {
+    height: 600vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Fixed background: poster + scroll-scrubbed video --- */
+  .hero-bg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+    background: #0a0a0a url('assets/HeroImage-Final.png') center/cover no-repeat;
+  }
+  .hero-bg video {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    pointer-events: none;
+    will-change: contents;
+  }
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+      rgba(0,0,0,0.20) 0%,
+      rgba(0,0,0,0.05) 35%,
+      rgba(0,0,0,0.10) 65%,
+      rgba(0,0,0,0.40) 100%);
+    pointer-events: none;
+  }
+
+  /* --- Top Nav --- */
+  nav.top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 40px;
+    z-index: 50;
+    background: transparent;
+  }
+  nav .wordmark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: text-shadow 0.3s ease, letter-spacing 0.3s ease;
+    cursor: pointer;
+  }
+  nav .wordmark:hover {
+    text-shadow: 0 0 12px rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+  }
+  nav .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+  nav .nav-right a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    transition: color 0.25s ease, text-shadow 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  nav .nav-right a:hover {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+  nav .nav-right svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* --- Hero overlay text --- */
+  .hero {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8vw;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 1.02;
+    letter-spacing: -0.5px;
+    max-width: 18ch;
+    margin-bottom: 18px;
+  }
+  .hero h1 .name {
+    display: block;
+    font-size: clamp(18px, 1.5vw, 22px);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 22px;
+  }
+  .hero p.sub {
+    font-size: clamp(14px, 1.1vw, 17px);
+    color: rgba(255,255,255,0.82);
+    max-width: 56ch;
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+  .hero .scroll-cue {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    animation: cueBob 2.2s ease-in-out infinite;
+  }
+  @keyframes cueBob {
+    0%, 100% { transform: translateY(0); opacity: 0.65; }
+    50%      { transform: translateY(6px); opacity: 1; }
+  }
+
+  /* --- Wooden Plank Sign (hero corner stat) --- */
+  .plank-sign {
+    position: fixed;
+    bottom: 40px;
+    right: 44px;
+    z-index: 12;
+    width: 290px;
+    padding: 18px 22px 20px;
+    border-radius: 4px;
+    color: #f3e9d8;
+    font-family: 'DM Sans', sans-serif;
+    pointer-events: auto;
+    transform: rotate(-2.2deg);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.5s ease,
+                opacity 0.6s ease;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.12) 100%),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0.10) 0px,
+        rgba(0,0,0,0.10) 1px,
+        transparent 1px,
+        transparent 6px
+      ),
+      linear-gradient(180deg, var(--wood-2) 0%, var(--wood-1) 50%, var(--wood-3) 100%);
+    border: 1px solid rgba(0,0,0,0.45);
+    box-shadow:
+      0 6px 18px rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 0 24px rgba(0,0,0,0.30);
+    cursor: default;
+    will-change: transform;
+  }
+  .plank-sign::before,
+  .plank-sign::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #2a1a0e, #0d0805);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .plank-sign::before { top: 8px; left: 10px; }
+  .plank-sign::after  { top: 8px; right: 10px; }
+  .plank-sign:hover {
+    transform: rotate(-1deg) translateY(-3px);
+    box-shadow:
+      0 12px 28px rgba(0,0,0,0.55),
+      0 0 22px rgba(245, 200, 130, 0.18),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 0 24px rgba(0,0,0,0.30);
+  }
+  .plank-sign .stat {
+    display: block;
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1.1;
+    color: #fff7e3;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .plank-sign .stat strong { color: #ffd784; font-weight: 400; }
+  .plank-sign .src {
+    display: block;
+    font-size: 10.5px;
+    color: rgba(243, 233, 216, 0.62);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .plank-sign .ask {
+    display: block;
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.25;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+  }
+
+  /* --- Right-side scroll-jump nav (top-anchored, hugs the edge) --- */
+  nav.side-nav {
+    position: fixed;
+    top: 96px;
+    right: 22px;
+    left: auto;
+    bottom: auto;
+    width: auto;
+    z-index: 45;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    pointer-events: auto;
+  }
+  .side-nav button {
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(255,255,255,0.18);
+    padding: 4px 0 4px 14px;
+    color: rgba(255,255,255,0.75);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.25s ease,
+                border-color 0.25s ease,
+                padding-left 0.25s ease,
+                text-shadow 0.25s ease;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .side-nav button .num {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1.5px;
+    transition: color 0.25s ease;
+  }
+  .side-nav button:hover {
+    color: #fff;
+    border-left-color: rgba(255,255,255,0.6);
+    padding-left: 18px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.45);
+  }
+  .side-nav button.active {
+    color: #fff;
+    border-left-color: var(--sage-bright);
+    padding-left: 18px;
+  }
+  .side-nav button.active .num { color: var(--sage-bright); }
+
+  /* --- Card layer --- */
+  .card-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    perspective: 1000px;
+  }
+
+  .card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 660px;
+    max-width: calc(100vw - 80px);
+    transform: translate(-50%, -50%) translateY(110vh);
+    opacity: 0;
+    padding: 44px 48px 40px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.30),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    pointer-events: none;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .card { background: rgba(20, 26, 22, 0.78); }
+  }
+
+  .card.visible {
+    transform: translate(-50%, -50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .card.exited {
+    transform: translate(-50%, -50%) translateY(-110vh);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(255,255,255,0.16),
+      transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: var(--white-2);
+    margin-bottom: 16px;
+  }
+  .card p.dense {
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(232, 232, 232, 0.92);
+  }
+
+  /* tabs (Card 1) */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    padding: 4px;
+    background: rgba(0,0,0,0.20);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab-row button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.65);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .tab-row button:hover { color: #fff; }
+  .tab-row button.active {
+    background: rgba(74, 124, 89, 0.30);
+    color: #fff;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* stats grid (Card 1) */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 16px;
+    margin: 18px 0 18px;
+    padding: 16px 18px;
+    background: rgba(0,0,0,0.22);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .stats-grid .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stats-grid .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--sage-bright);
+    line-height: 1;
+  }
+  .stats-grid .lbl {
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.3;
+  }
+  .insights {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+  }
+  .insights h4 {
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .insights li {
+    list-style: none;
+    font-size: 13.5px;
+    color: rgba(232, 232, 232, 0.9);
+    padding: 4px 0 4px 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .insights li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--sage-bright);
+  }
+
+  /* concept blocks (Card 2) */
+  .concept-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .concept {
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 10px;
+    transition: border-color 0.25s ease, background 0.25s ease;
+  }
+  .concept:hover {
+    border-color: rgba(74,124,89,0.5);
+    background: rgba(0,0,0,0.28);
+  }
+  .concept .term {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--sage-bright);
+    margin-bottom: 4px;
+    letter-spacing: 0.2px;
+  }
+  .concept .def {
+    font-size: 12.5px;
+    color: var(--white-2);
+    line-height: 1.45;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  /* use-case rows (Card 3) */
+  .usecase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .usecase {
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-left: 3px solid var(--sage);
+    border-radius: 8px;
+    transition: border-left-color 0.25s ease, background 0.25s ease;
+  }
+  .usecase:hover {
+    border-left-color: var(--sage-bright);
+    background: rgba(0,0,0,0.30);
+  }
+  .usecase .scenario {
+    font-size: 13.5px;
+    color: var(--white-2);
+    line-height: 1.5;
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+  .usecase .outcome {
+    font-size: 13px;
+    color: var(--sage-bright);
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+  .usecase .outcome strong { color: #fff; font-weight: 600; }
+
+  /* projects list (Card 4) */
+  .proj-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+  .proj-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    row-gap: 4px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 14px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .proj-row:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(74,124,89,0.4);
+  }
+  .proj-row .title {
+    color: #fff;
+    font-weight: 500;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .proj-row .title .meta {
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    font-size: 12.5px;
+  }
+  .proj-row .arrow {
+    color: var(--sage-bright);
+    font-size: 16px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .proj-row:hover .arrow { transform: translateX(4px); }
+  .proj-row .blurb {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 12.5px;
+    color: rgba(232, 232, 232, 0.78);
+    line-height: 1.45;
+    font-weight: 300;
+  }
+  .proj-row.sub {
+    padding: 8px 14px 8px 36px;
+    font-size: 13px;
+    background: rgba(0,0,0,0.12);
+  }
+  .proj-row.sub::before {
+    content: '↳';
+    position: absolute;
+    left: 18px;
+    top: 10px;
+    color: rgba(255,255,255,0.45);
+    font-size: 14px;
+  }
+  .proj-row.sub .title { font-weight: 400; font-size: 13.5px; }
+  .proj-row.sub .blurb { font-size: 11.5px; }
+
+  /* CTA links */
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: center;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 0;
+    transition: color 0.25s ease;
+    will-change: transform;
+  }
+  .cta .arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cta:hover { color: #c9e3d0; }
+  .cta:hover .arrow { transform: translateX(4px); }
+
+  /* Card 5 contact emphasis */
+  .card.contact h2 { font-size: 38px; }
+
+  /* mobile fallback */
+  @media (max-width: 768px) {
+    .scroll-container { height: auto; }
+    .hero-bg { position: relative; height: 90vh; }
+    .hero-bg video { display: none; }
+    .hero { position: absolute; padding: 0 7vw; }
+    .plank-sign {
+      position: absolute;
+      bottom: 28px;
+      right: 22px;
+      width: 240px;
+    }
+    .side-nav { display: none; }
+    .card-layer {
+      position: relative;
+      inset: auto;
+      perspective: none;
+      pointer-events: auto;
+      padding: 60px 18px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      background: linear-gradient(180deg, #0a0a0a 0%, #0e1410 100%);
+    }
+    .card {
+      position: relative;
+      top: auto; left: auto;
+      transform: none !important;
+      opacity: 1 !important;
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      pointer-events: auto;
+      padding: 28px 24px;
+    }
+    .card::before { display: none; }
+    nav.top-nav { padding: 16px 20px; }
+    .concept-list { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="#" class="wordmark" aria-label="Logan Matson">Logan Matson</a>
+  <div class="nav-right">
+    <a href="mailto:lpmats09@gmail.com">lpmats09@gmail.com</a>
+    <a href="#" aria-label="LinkedIn" id="linkedin-link">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="hero-bg" aria-hidden="true">
+  <video id="flyvideo" muted playsinline preload="auto" poster="assets/HeroImage-Final.png">
+    <source src="assets/LoganFInalVIdeoX.mov" type="video/quicktime" />
+    <source src="assets/HeroVideo-Flythrough.mp4" type="video/mp4" />
+  </video>
+</div>
+
+<section class="hero" id="hero">
+  <h1>
+    <span class="name">Logan Matson</span>
+    The future of work,<br/>built by hand.
+  </h1>
+  <p class="sub">AI systems. Automation pipelines. Tools that run while you sleep.</p>
+  <span class="scroll-cue">Scroll to explore <span aria-hidden="true">↓</span></span>
+</section>
+
+<aside class="plank-sign" id="plank" aria-label="Industry stat">
+  <span class="stat">Mature AI shops post a <strong>540% median ROI.</strong></span>
+  <span class="src">McKinsey · 2025 Year-End AI Report</span>
+  <span class="ask">Do you want to get left behind?</span>
+</aside>
+
+<nav class="side-nav" id="sidenav" aria-label="Section navigation">
+  <button data-target="card-1"><span class="num">01</span> A Real Impact</button>
+  <button data-target="card-2"><span class="num">02</span> How I Build</button>
+  <button data-target="card-3"><span class="num">03</span> Working Together</button>
+  <button data-target="card-4"><span class="num">04</span> More Builds</button>
+  <button data-target="card-5"><span class="num">05</span> Contact</button>
+</nav>
+
+<div class="card-layer">
+
+  <!-- Card 1 — A Real Impact -->
+  <article class="card" id="card-1" data-in="0.20" data-out="0.32">
+    <div class="card-eyebrow">01 — Case Study</div>
+    <h2>A Real Impact</h2>
+
+    <div class="tab-row" role="tablist">
+      <button class="active" data-panel="p1-overview" type="button">Overview</button>
+      <button data-panel="p1-demo" type="button">Ecosystem Demo</button>
+      <button data-panel="p1-validator" type="button">Validator</button>
+    </div>
+
+    <div class="tab-panel active" id="p1-overview">
+      <p class="dense">Six autonomous agents — meal planner, training calendar, neurologist risk forecaster, Whoop analyst, Google Workspace operator, weekly orchestrator — running on a shared <em>pipeline-state.json</em> nervous system. Twenty-five-plus subagents handle parallel work. Calibration weights self-tune monthly through a retrospective validator that checks every forecast against real biometric outcomes.</p>
+
+      <div class="stats-grid">
+        <div class="stat"><span class="num">126</span><span class="lbl">days of self-tracked signals</span></div>
+        <div class="stat"><span class="num">35+</span><span class="lbl">data points captured per day</span></div>
+        <div class="stat"><span class="num">3,707</span><span class="lbl">Whoop biometric rows analyzed</span></div>
+        <div class="stat"><span class="num">16</span><span class="lbl">calibration factors tuned monthly</span></div>
+      </div>
+
+      <div class="insights">
+        <h4>Key insights surfaced</h4>
+        <ul>
+          <li>HRV → next-day recovery <strong>r = 0.815</strong> — the strongest predictor in the system</li>
+          <li>Strength days yield <strong>+6% next-day recovery</strong> vs. run days; rest days redistributed accordingly</li>
+          <li>Forecast-driven rest has cut overtraining flags and lifted average weekly training quality</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="p1-demo">
+      <p class="dense">Interactive map of the agent network — circular SVG flow, expandable role panels, animated handoffs between subagents. Built to show how the system thinks before it acts.</p>
+      <div class="cta-row">
+        <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
+          <span class="arrow">→</span> Open Demo
+        </a>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="p1-validator">
+      <p class="dense">Monthly retrospective validator: every forecast (training load, recovery, seizure risk, meal-recovery correlation) is checked against the next month's real biometric data. Drift gets pushed back into <em>agent-weights.json</em> so the system gets smarter on its own.</p>
+      <div class="cta-row">
+        <a class="cta" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
+          <span class="arrow">→</span> View Dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="cta-row" style="margin-top: 6px;">
+      <a class="cta" href="https://github.com/loganmatson/health-agent-ecosystem" target="_blank" rel="noopener">
+        <span class="arrow">→</span> GitHub
+      </a>
+    </div>
+  </article>
+
+  <!-- Card 2 — How I Build -->
+  <article class="card" id="card-2" data-in="0.36" data-out="0.48">
+    <div class="card-eyebrow">02 — Architecture</div>
+    <h2>How I Build</h2>
+    <p class="dense">A pattern, not a product. Anyone can apply it.</p>
+
+    <div class="concept-list">
+      <div class="concept">
+        <span class="term">Agents</span>
+        <p class="def">Autonomous workers that complete a job end-to-end — from input to delivered output, no babysitting.</p>
+      </div>
+      <div class="concept">
+        <span class="term">Skills</span>
+        <p class="def">Reusable capabilities the agents draw from. Think of them as muscle memory the system never forgets.</p>
+      </div>
+      <div class="concept">
+        <span class="term">Workflows</span>
+        <p class="def">Orchestrated sequences. One agent's output becomes the next agent's input — a chain of small, validated steps.</p>
+      </div>
+      <div class="concept">
+        <span class="term">Subagent Dispatching</span>
+        <p class="def">Independent tasks fanned out in parallel. Each runs in its own context so nothing bleeds into the others.</p>
+      </div>
+      <div class="concept">
+        <span class="term">State Files</span>
+        <p class="def">A shared JSON nervous system. Every component writes its block; every component reads what it needs.</p>
+      </div>
+      <div class="concept">
+        <span class="term">Self-Calibration</span>
+        <p class="def">Agents that audit their own forecasts and tune their weights from the gap. They get sharper with every run.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card 3 — How I Can Help -->
+  <article class="card" id="card-3" data-in="0.52" data-out="0.64">
+    <div class="card-eyebrow">03 — Working Together</div>
+    <h2>What I Do For You</h2>
+
+    <div class="usecase-list">
+      <div class="usecase">
+        <p class="scenario">Solo founder drowning in admin → a morning digest agent that reads your inbox, calendar, and Slack and delivers one Gmail at 7am.</p>
+        <p class="outcome"><strong>~5 hours/week</strong> reclaimed · 100% inbox triage before your first meeting</p>
+      </div>
+      <div class="usecase">
+        <p class="scenario">Small team running 8 spreadsheets → one pipeline that pulls from your tools every night and updates itself.</p>
+        <p class="outcome"><strong>90% reduction</strong> in data-entry errors · 8 spreadsheets → 1 source of truth</p>
+      </div>
+      <div class="usecase">
+        <p class="scenario">Data but no insights → a self-calibrating analyst agent that learns your domain over 30 days and surfaces what you'd never catch by hand.</p>
+        <p class="outcome"><strong>Pattern detection in 4 weeks</strong> · forecast accuracy compounds month over month</p>
+      </div>
+      <div class="usecase">
+        <p class="scenario">Stuck on repetitive ops work → I install one agent and walk your team through running it. You own it the day I leave.</p>
+        <p class="outcome"><strong>One working pipeline</strong> deployed before handoff · zero vendor lock-in · full source delivered</p>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="cta" href="mailto:lpmats09@gmail.com?subject=Let's%20Talk">
+        <span class="arrow">→</span> Let's Talk
+      </a>
+    </div>
+  </article>
+
+  <!-- Card 4 — More Builds -->
+  <article class="card" id="card-4" data-in="0.68" data-out="0.80">
+    <div class="card-eyebrow">04 — More Builds</div>
+    <h2>More Builds</h2>
+    <div class="proj-list">
+
+      <a class="proj-row" href="https://loganmatson.github.io/health-agent-ecosystem" target="_blank" rel="noopener">
+        <span class="title">Health Agent Ecosystem
+          <span class="meta">· flagship · 6 agents · 25+ subagents</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">A multi-agent network that plans my training, food, and recovery every week — with zero manual handoffs. Why it matters: it proves the architecture works in production, not just on a slide.</span>
+      </a>
+
+      <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
+        <span class="title">Ecosystem Demo
+          <span class="meta">· interactive SVG flow</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Click any agent to expand its role, inputs, and outputs. Built so anyone can see exactly how the network reasons step-by-step.</span>
+      </a>
+
+      <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
+        <span class="title">Validator Dashboard
+          <span class="meta">· monthly accuracy tracker</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Every forecast checked against real biometrics. Drift gets pushed back into the system — the whole pipeline gets sharper on its own.</span>
+      </a>
+
+      <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/marathon-plan.html" target="_blank" rel="noopener">
+        <span class="title">Pittsburgh Marathon Plan
+          <span class="meta">· cartographic 7-zone race plan</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Race-day pacing strategy, nutrition windows, and elevation-aware tactics for all 26.2 miles. Why it matters: turns a generic training app into a custom tactical brief.</span>
+      </a>
+
+      <!-- TODO: link to monthly Whoop PDF once GitHub Pages route is set (loganmatson.github.io/health-agent-ecosystem/outputs/whoop/...) -->
+      <a class="proj-row" href="https://github.com/loganmatson/health-agent-ecosystem/tree/main/outputs/whoop" target="_blank" rel="noopener">
+        <span class="title">Whoop Performance Brief
+          <span class="meta">· monthly analyst PDF · 1,500+ data points</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Auto-generated each month from raw Whoop CSVs — sleep, strain, recovery, behavioral correlations. Why it matters: the same pipeline works for any time-series data, not just biometrics.</span>
+      </a>
+
+      <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/skill-portfolio.html" target="_blank" rel="noopener">
+        <span class="title">Skill Portfolio
+          <span class="meta">· 30+ skill empire · self-managing</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Live index of every reusable capability my agents draw from — created, audited, and rotated automatically. Why it matters: shows how a system can curate itself without me touching it.</span>
+      </a>
+
+      <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/scotland.html" target="_blank" rel="noopener">
+        <span class="title">Scotland · London · Dublin Itinerary
+          <span class="meta">· 9-day interactive trip planner</span>
+        </span>
+        <span class="arrow">→</span>
+        <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links — all in one HTML file. Why it matters: same pattern works for any complex personal logistics, not just travel.</span>
+      </a>
+
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="https://github.com/loganmatson" target="_blank" rel="noopener">
+        <span class="arrow">→</span> View All on GitHub
+      </a>
+    </div>
+  </article>
+
+  <!-- Card 5 — Contact -->
+  <article class="card contact" id="card-5" data-in="0.84" data-out="1.10">
+    <div class="card-eyebrow">05 — Contact</div>
+    <h2>Let's Build Something</h2>
+    <div class="cta-row">
+      <a class="cta" href="mailto:lpmats09@gmail.com">
+        <span class="arrow">→</span> lpmats09@gmail.com
+      </a>
+      <!-- TODO: Replace href with Logan's Google Calendar appointment-schedule URL.
+           Set up at: https://calendar.google.com/calendar/u/0/r/settings/appointmentschedules -->
+      <a class="cta" href="#" id="book-cta" target="_blank" rel="noopener">
+        <span class="arrow">→</span> Book 15 min
+      </a>
+      <a class="cta" href="#" id="linkedin-cta" target="_blank" rel="noopener">
+        <span class="arrow">→</span> LinkedIn
+      </a>
+    </div>
+  </article>
+
+</div>
+
+<div class="scroll-container" aria-hidden="true"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const video = document.getElementById('flyvideo');
+  const hero = document.getElementById('hero');
+  const plank = document.getElementById('plank');
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const sideNavBtns = Array.from(document.querySelectorAll('.side-nav button'));
+
+  // ---- Mobile fallback ----
+  if (isMobile) {
+    if (video) { video.removeAttribute('preload'); video.pause?.(); }
+    cards.forEach(c => c.classList.add('visible'));
+    return;
+  }
+
+  // ---- Tabs (Card 1) ----
+  document.querySelectorAll('.tab-row').forEach(row => {
+    const btns = Array.from(row.querySelectorAll('button'));
+    btns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = btn.dataset.panel;
+        btns.forEach(b => b.classList.toggle('active', b === btn));
+        const card = row.closest('.card');
+        card.querySelectorAll('.tab-panel').forEach(p => {
+          p.classList.toggle('active', p.id === target);
+        });
+      });
+    });
+  });
+
+  // ---- Video readiness ----
+  let videoReady = false;
+  let videoDuration = 0;
+  if (video) {
+    video.addEventListener('loadedmetadata', () => {
+      videoDuration = video.duration || 0;
+      videoReady = videoDuration > 0 && isFinite(videoDuration);
+    });
+    video.addEventListener('canplay', () => {
+      if (!videoReady && video.duration && isFinite(video.duration)) {
+        videoDuration = video.duration;
+        videoReady = true;
+      }
+    });
+  }
+
+  // ---- Scroll progress + scrubbing ----
+  let ticking = false;
+  let currentActive = null;
+
+  function getScrollProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max <= 0) return 0;
+    return Math.min(1, Math.max(0, window.scrollY / max));
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(applyScroll);
+      ticking = true;
+    }
+  }
+
+  function applyScroll() {
+    ticking = false;
+    const p = getScrollProgress();
+
+    // Hero fade — out by 8%
+    if (hero) {
+      const heroFade = Math.max(0, 1 - p / 0.08);
+      hero.style.opacity = heroFade.toFixed(3);
+      hero.style.transform = `translateY(${(-p * 60).toFixed(1)}px)`;
+    }
+    // Plank sign — fade with hero
+    if (plank) {
+      const plankFade = Math.max(0, 1 - p / 0.12);
+      plank.style.opacity = plankFade.toFixed(3);
+    }
+
+    // Video scrub
+    if (videoReady) {
+      const vp = Math.min(1, p / 0.85);
+      const targetTime = vp * videoDuration;
+      if (Math.abs(video.currentTime - targetTime) > 0.016) {
+        try { video.currentTime = targetTime; } catch (_) { /* noop */ }
+      }
+    }
+
+    // Cards
+    let activeCard = null;
+    cards.forEach(card => {
+      const inAt = parseFloat(card.dataset.in);
+      const outAt = parseFloat(card.dataset.out);
+      if (p >= inAt && p < outAt) {
+        card.classList.add('visible');
+        card.classList.remove('exited');
+        activeCard = card.id;
+      } else if (p >= outAt) {
+        card.classList.remove('visible');
+        card.classList.add('exited');
+      } else {
+        card.classList.remove('visible');
+        card.classList.remove('exited');
+      }
+    });
+
+    // Side-nav active state — bias toward closest card if between
+    if (!activeCard) {
+      let closest = null;
+      let closestDist = Infinity;
+      cards.forEach(c => {
+        const inAt = parseFloat(c.dataset.in);
+        const d = Math.abs(p - inAt);
+        if (d < closestDist) { closestDist = d; closest = c.id; }
+      });
+      activeCard = closest;
+    }
+    if (activeCard !== currentActive) {
+      currentActive = activeCard;
+      sideNavBtns.forEach(b => b.classList.toggle('active', b.dataset.target === activeCard));
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', applyScroll);
+  requestAnimationFrame(applyScroll);
+
+  // ---- Side-nav click → smooth scroll to card threshold ----
+  sideNavBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      const inAt = parseFloat(target.dataset.in);
+      // land slightly inside the card's window for a clean entry
+      const landP = inAt + 0.015;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const top = landP * max;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  // ---- Card 3D tilt + spotlight (state, written in unified rAF below) ----
+  // When the cursor is over an interactive child (button/link), we damp the tilt
+  // so the click target doesn't move out from under the cursor.
+  const cardState = new WeakMap();
+  cards.forEach(card => {
+    cardState.set(card, { hover: false, mx: 0.5, my: 0.5, px: 0, py: 0, overInteractive: false });
+
+    card.addEventListener('mouseenter', () => {
+      const s = cardState.get(card); s.hover = true;
+    });
+    card.addEventListener('mouseleave', () => {
+      const s = cardState.get(card); s.hover = false; s.overInteractive = false;
+      card.style.setProperty('--mouse-x', '50%');
+      card.style.setProperty('--mouse-y', '50%');
+    });
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const s = cardState.get(card);
+      s.px = px; s.py = py;
+      s.mx = px / rect.width;
+      s.my = py / rect.height;
+      // damp tilt over buttons + links
+      const t = e.target;
+      s.overInteractive = !!(t.closest && t.closest('button, a'));
+    });
+  });
+
+  // ---- Pending links (Marathon, Scotland): prevent default until pushed ----
+  document.querySelectorAll('[data-pending]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const old = link.querySelector('.title .meta');
+      if (old && !link.dataset.notified) {
+        const original = old.textContent;
+        old.textContent = '· coming soon';
+        link.dataset.notified = '1';
+        setTimeout(() => { old.textContent = original; link.dataset.notified = ''; }, 1500);
+      }
+    });
+  });
+
+  // Magnetic per-link translation removed: only the parent card moves.
+  // Per-link hover state is handled in CSS (background tint, border, arrow nudge).
+
+  // ---- Unified rAF: tilt + spotlight + ambient float + magnetic ----
+  // All transform writes per element happen in one place to avoid races.
+  let t0 = performance.now();
+  const TILT_MAX = 15;     // degrees
+  const TILT_SCALE = 1.04;
+  const FLOAT_AMP = 8;     // pixels
+  const FLOAT_PERIOD = 1.5; // matches sin(elapsed / 1.5) ~ 9.4s wave
+
+  function frame(now) {
+    const elapsed = (now - t0) / 1000;
+
+    cards.forEach(card => {
+      if (!card.classList.contains('visible')) return;
+      const s = cardState.get(card);
+      if (s.hover) {
+        card.style.setProperty('--mouse-x', s.px + 'px');
+        card.style.setProperty('--mouse-y', s.py + 'px');
+        // Damp tilt to ~25% when over an interactive child so clicks land cleanly
+        const damping = s.overInteractive ? 0.25 : 1;
+        const rx = (-(s.my - 0.5) * TILT_MAX * damping).toFixed(2);
+        const ry = ((s.mx - 0.5) * TILT_MAX * damping).toFixed(2);
+        const sc = s.overInteractive ? 1.01 : TILT_SCALE;
+        card.style.transform =
+          `translate(-50%, -50%) translateY(0) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})`;
+      } else {
+        const drift = Math.sin(elapsed / FLOAT_PERIOD) * FLOAT_AMP;
+        card.style.transform =
+          `translate(-50%, -50%) translateY(${drift.toFixed(2)}px) rotateX(0) rotateY(0) scale(1)`;
+      }
+    });
+
+    requestAnimationFrame(frame);
+  }
+  if (!prefersReduced) requestAnimationFrame(frame);
+
+  // ---- Pre-warm video buffer for smooth seeks ----
+  if (video) {
+    const warm = () => {
+      const pr = video.play();
+      if (pr && typeof pr.then === 'function') {
+        pr.then(() => video.pause()).catch(() => { /* ok */ });
+      } else {
+        try { video.pause(); } catch (_) {}
+      }
+    };
+    if (video.readyState >= 2) warm();
+    else video.addEventListener('canplay', warm, { once: true });
+  }
+
+})();
+</script>
+</body>
+</html>
