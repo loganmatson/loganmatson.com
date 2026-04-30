@@ -45,7 +45,7 @@
   /* scroll-behavior: smooth conflicts with scroll-scrubbing — never use it */
 
   .scroll-container {
-    height: 600vh;
+    height: 700vh;  /* Extra height for new "Why Now" card (was 600vh) */
     position: relative;
     z-index: 1;
   }
@@ -176,88 +176,6 @@
   @keyframes cueBob {
     0%, 100% { transform: translateY(0); opacity: 0.65; }
     50%      { transform: translateY(6px); opacity: 1; }
-  }
-
-  /* --- Wooden Plank Sign (hero corner stat) --- */
-  .plank-sign {
-    position: fixed;
-    bottom: 40px;
-    right: 44px;
-    z-index: 12;
-    width: 290px;
-    padding: 18px 22px 20px;
-    border-radius: 4px;
-    color: #f3e9d8;
-    font-family: 'DM Sans', sans-serif;
-    pointer-events: auto;
-    transform: rotate(-2.2deg);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.5s ease,
-                opacity 0.6s ease;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.12) 100%),
-      repeating-linear-gradient(
-        90deg,
-        rgba(0,0,0,0.10) 0px,
-        rgba(0,0,0,0.10) 1px,
-        transparent 1px,
-        transparent 6px
-      ),
-      linear-gradient(180deg, var(--wood-2) 0%, var(--wood-1) 50%, var(--wood-3) 100%);
-    border: 1px solid rgba(0,0,0,0.45);
-    box-shadow:
-      0 6px 18px rgba(0,0,0,0.45),
-      inset 0 1px 0 rgba(255,255,255,0.08),
-      inset 0 0 24px rgba(0,0,0,0.30);
-    cursor: default;
-    will-change: transform;
-  }
-  .plank-sign::before,
-  .plank-sign::after {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #2a1a0e, #0d0805);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  }
-  .plank-sign::before { top: 8px; left: 10px; }
-  .plank-sign::after  { top: 8px; right: 10px; }
-  .plank-sign:hover {
-    transform: rotate(-1deg) translateY(-3px);
-    box-shadow:
-      0 12px 28px rgba(0,0,0,0.55),
-      0 0 22px rgba(245, 200, 130, 0.18),
-      inset 0 1px 0 rgba(255,255,255,0.10),
-      inset 0 0 24px rgba(0,0,0,0.30);
-  }
-  .plank-sign .stat {
-    display: block;
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    line-height: 1.1;
-    color: #fff7e3;
-    margin-bottom: 6px;
-    letter-spacing: 0.2px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  }
-  .plank-sign .stat strong { color: #ffd784; font-weight: 400; }
-  .plank-sign .src {
-    display: block;
-    font-size: 10.5px;
-    color: rgba(243, 233, 216, 0.62);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-  .plank-sign .ask {
-    display: block;
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    color: #fff;
-    line-height: 1.25;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.55);
   }
 
   /* --- Right-side scroll-jump nav (top-anchored, hugs the edge) --- */
@@ -671,10 +589,65 @@
 
   /* Card 5 contact emphasis */
   .card.contact h2 { font-size: 38px; }
+  .cta-underline {
+    text-decoration: underline;
+    text-decoration-color: rgba(111, 166, 126, 0.6);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: color 0.25s ease, text-decoration-color 0.25s ease;
+  }
+  .cta-underline:hover {
+    text-decoration-color: var(--sage-bright);
+  }
+  .contact-cta-row { flex-direction: column; align-items: flex-start; gap: 14px; }
 
-  /* Card 4 — matches Card 1 width */
-  .card#card-4 { width: 800px; }
-  .proj-row .blurb strong { color: #fff; font-weight: 600; }
+  /* Card 6 — Why Now (4 stats, format B provocations) */
+  .why-now-list { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+  .why-now-item {
+    padding: 16px 18px;
+    background: rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-left: 3px solid var(--sage);
+    border-radius: 8px;
+    transition: border-left-color 0.25s ease, background 0.25s ease;
+  }
+  .why-now-item:hover {
+    border-left-color: var(--sage-bright);
+    background: rgba(0,0,0,0.30);
+  }
+  .why-now-stat {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: #fff;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    letter-spacing: -0.1px;
+  }
+  .why-now-stat strong { color: var(--sage-bright); font-weight: 400; }
+  .why-now-line {
+    font-size: 13px;
+    color: rgba(232, 232, 232, 0.78);
+    line-height: 1.5;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* Card 4 — wider + tighter padding so all 7 builds fit without clipping */
+  .card#card-4 {
+    width: 880px;
+    padding: 32px 40px 28px;
+    max-height: calc(100vh - 80px);
+  }
+  /* Card 4 row blurb: takeaway sentence renders on its own line, sage-green */
+  .proj-row .blurb { display: block; }
+  .proj-row .blurb .takeaway {
+    display: block;
+    color: var(--sage-bright);
+    font-weight: 500;
+    margin-top: 4px;
+    font-size: 12.5px;
+    letter-spacing: 0.1px;
+  }
 
   /* Card 1 subhead under "A Real Impact" */
   .card .subhead {
@@ -733,12 +706,6 @@
     .hero-bg { position: relative; height: 90vh; }
     .hero-bg video { display: none; }
     .hero { position: absolute; padding: 0 7vw; }
-    .plank-sign {
-      position: absolute;
-      bottom: 28px;
-      right: 22px;
-      width: 240px;
-    }
     .side-nav { display: none; }
     .card-layer {
       position: relative;
@@ -775,7 +742,7 @@
   <a href="#" class="wordmark" aria-label="Logan Matson">Logan Matson</a>
   <div class="nav-right">
     <a href="mailto:lpmats09@gmail.com">lpmats09@gmail.com</a>
-    <a href="#" aria-label="LinkedIn" id="linkedin-link">
+    <a href="https://www.linkedin.com/in/loganmatson/" target="_blank" rel="noopener" aria-label="LinkedIn" id="linkedin-link">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z"/></svg>
     </a>
   </div>
@@ -797,18 +764,13 @@
   <span class="scroll-cue">Scroll to explore <span aria-hidden="true">↓</span></span>
 </section>
 
-<aside class="plank-sign" id="plank" aria-label="Industry stat">
-  <span class="stat">Mature AI shops post a <strong>540% median ROI.</strong></span>
-  <span class="src">McKinsey · 2025 Year-End AI Report</span>
-  <span class="ask">Do you want to get left behind?</span>
-</aside>
-
 <nav class="side-nav" id="sidenav" aria-label="Section navigation">
   <button data-target="card-1"><span class="num">01</span> A Real Impact</button>
   <button data-target="card-2"><span class="num">02</span> How I Build</button>
   <button data-target="card-3"><span class="num">03</span> Working Together</button>
-  <button data-target="card-4"><span class="num">04</span> More Builds</button>
-  <button data-target="card-5"><span class="num">05</span> Contact</button>
+  <button data-target="card-4"><span class="num">04</span> In Production</button>
+  <button data-target="card-6"><span class="num">05</span> Why Now</button>
+  <button data-target="card-5"><span class="num">06</span> Contact</button>
 </nav>
 
 <div class="card-layer">
@@ -960,7 +922,7 @@
   <!-- Card 4 — More Builds -->
   <article class="card" id="card-4" data-in="0.68" data-out="0.80">
     <div class="card-eyebrow">04 — More Builds</div>
-    <h2>More Builds</h2>
+    <h2>In Production</h2>
     <div class="proj-list">
 
       <a class="proj-row" href="https://loganmatson.github.io/health-agent-ecosystem" target="_blank" rel="noopener">
@@ -968,7 +930,7 @@
           <span class="meta">· flagship · 6 agents · 25+ subagents</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">A multi-agent network that plans my training, food, and recovery every week — with zero manual handoffs. <strong>It proves the architecture works in production, not just on a slide.</strong></span>
+        <span class="blurb">A multi-agent network that plans my training, food, and recovery every week, with zero manual handoffs.<span class="takeaway">It proves the architecture works in production, not just on a slide.</span></span>
       </a>
 
       <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
@@ -976,7 +938,7 @@
           <span class="meta">· interactive SVG flow</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Click any agent to expand its role, inputs, and outputs. <strong>Built so anyone can see exactly how the network reasons step-by-step.</strong></span>
+        <span class="blurb">Click any agent to expand its role, inputs, and outputs.<span class="takeaway">Built so anyone can see exactly how the network reasons step by step.</span></span>
       </a>
 
       <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
@@ -984,7 +946,7 @@
           <span class="meta">· monthly accuracy tracker</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Every forecast checked against real biometrics. <strong>Drift gets pushed back into the system — the whole pipeline gets sharper on its own.</strong></span>
+        <span class="blurb">Every forecast checked against real biometrics.<span class="takeaway">Drift gets pushed back into the system; the whole pipeline gets sharper on its own.</span></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/marathon-plan.html" target="_blank" rel="noopener">
@@ -992,7 +954,7 @@
           <span class="meta">· cartographic 7-zone race plan</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Race-day pacing strategy, nutrition windows, and elevation-aware tactics for all 26.2 miles. <strong>Turns a generic training app into a custom tactical brief.</strong></span>
+        <span class="blurb">Race-day pacing strategy, nutrition windows, and elevation-aware tactics for all 26.2 miles.<span class="takeaway">Turns a generic training app into a custom tactical brief.</span></span>
       </a>
 
       <!-- TODO: link to monthly Whoop PDF once GitHub Pages route is set (loganmatson.github.io/health-agent-ecosystem/outputs/whoop/...) -->
@@ -1001,7 +963,7 @@
           <span class="meta">· monthly analyst PDF · 1,500+ data points</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Auto-generated each month from raw Whoop CSVs — sleep, strain, recovery, behavioral correlations. <strong>The same pipeline works for any time-series data, not just biometrics.</strong></span>
+        <span class="blurb">Auto-generated each month from raw Whoop CSVs: sleep, strain, recovery, behavioral correlations.<span class="takeaway">The same pipeline works for any time-series data, not just biometrics.</span></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/skill-portfolio.html" target="_blank" rel="noopener">
@@ -1009,7 +971,7 @@
           <span class="meta">· 30+ skill empire · self-managing</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Live index of every reusable capability my agents draw from — created, audited, and rotated automatically. <strong>Shows how a system can curate itself without me touching it.</strong></span>
+        <span class="blurb">Live index of every reusable capability my agents draw from: created, audited, and rotated automatically.<span class="takeaway">Shows how a system can curate itself without me touching it.</span></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/scotland.html" target="_blank" rel="noopener">
@@ -1017,7 +979,7 @@
           <span class="meta">· 9-day interactive trip planner</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links — all in one HTML file. <strong>Same pattern works for any complex personal logistics, not just travel.</strong></span>
+        <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links, all in one HTML file.<span class="takeaway">Same pattern works for any complex personal logistics, not just travel.</span></span>
       </a>
 
     </div>
@@ -1028,21 +990,41 @@
     </div>
   </article>
 
+  <!-- Card 6 — Why Now -->
+  <article class="card" id="card-6" data-in="0.83" data-out="0.92">
+    <div class="card-eyebrow">05 — Why Now</div>
+    <h2>The Pack Is Already Moving</h2>
+
+    <div class="why-now-list">
+      <div class="why-now-item">
+        <p class="why-now-stat"><strong>AI agents cost $0.25 to $0.50 per task. Humans cost $3 to $6.</strong></p>
+        <p class="why-now-line">That's a 90% per-interaction cost cut, and you sleep through it.</p>
+      </div>
+      <div class="why-now-item">
+        <p class="why-now-stat"><strong>AI super users save 9 hours every week.</strong></p>
+        <p class="why-now-line">That's 6 weeks a year reclaimed for the people who actually integrate it. The rest are still in meetings.</p>
+      </div>
+      <div class="why-now-item">
+        <p class="why-now-stat"><strong>3.5x average ROI on AI agent investment. Top performers hit 8x.</strong></p>
+        <p class="why-now-line">Year 1 returns 41%; year 3 compounds past 124%. Waiting costs you the curve.</p>
+      </div>
+      <div class="why-now-item">
+        <p class="why-now-stat"><strong>94% of companies have deployed AI but report no significant value from it.</strong></p>
+        <p class="why-now-line">Get ahead of the pack. The difference is who actually integrates the tools, not who buys them.</p>
+      </div>
+    </div>
+  </article>
+
   <!-- Card 5 — Contact -->
-  <article class="card contact" id="card-5" data-in="0.84" data-out="1.10">
-    <div class="card-eyebrow">05 — Contact</div>
+  <article class="card contact" id="card-5" data-in="0.93" data-out="1.20">
+    <div class="card-eyebrow">06 — Contact</div>
     <h2>Let's Build Something</h2>
-    <div class="cta-row">
-      <a class="cta" href="mailto:lpmats09@gmail.com">
-        <span class="arrow">→</span> lpmats09@gmail.com
+    <div class="cta-row contact-cta-row">
+      <a class="cta cta-underline" href="mailto:lpmats09@gmail.com?subject=Tell%20me%20what's%20broken">
+        <span class="arrow">→</span> Tell me what's broken, I'll show you what to build
       </a>
-      <!-- TODO: Replace href with Logan's Google Calendar appointment-schedule URL.
-           Set up at: https://calendar.google.com/calendar/u/0/r/settings/appointmentschedules -->
-      <a class="cta" href="#" id="book-cta" target="_blank" rel="noopener">
-        <span class="arrow">→</span> Book 15 min
-      </a>
-      <a class="cta" href="#" id="linkedin-cta" target="_blank" rel="noopener">
-        <span class="arrow">→</span> LinkedIn
+      <a class="cta cta-underline" href="https://www.linkedin.com/in/loganmatson/" id="linkedin-cta" target="_blank" rel="noopener">
+        <span class="arrow">→</span> Connect on LinkedIn
       </a>
     </div>
   </article>
@@ -1060,7 +1042,6 @@
 
   const video = document.getElementById('flyvideo');
   const hero = document.getElementById('hero');
-  const plank = document.getElementById('plank');
   const cards = Array.from(document.querySelectorAll('.card'));
   const sideNavBtns = Array.from(document.querySelectorAll('.side-nav button'));
 
@@ -1131,11 +1112,6 @@
       hero.style.transform = `translateY(${(-p * 60).toFixed(1)}px)`;
     }
     // Plank sign — fade with hero
-    if (plank) {
-      const plankFade = Math.max(0, 1 - p / 0.12);
-      plank.style.opacity = plankFade.toFixed(3);
-    }
-
     // Video scrub
     if (videoReady) {
       const vp = Math.min(1, p / 0.85);
