@@ -332,8 +332,10 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 660px;
+    width: 800px;
     max-width: calc(100vw - 80px);
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
     transform: translate(-50%, -50%) translateY(110vh);
     opacity: 0;
     padding: 44px 48px 40px;
@@ -670,8 +672,8 @@
   /* Card 5 contact emphasis */
   .card.contact h2 { font-size: 38px; }
 
-  /* Card 4 — wider to keep project rows from spanning full viewport height */
-  .card#card-4 { width: 760px; }
+  /* Card 4 — matches Card 1 width */
+  .card#card-4 { width: 800px; }
   .proj-row .blurb strong { color: #fff; font-weight: 600; }
 
   /* Card 1 subhead under "A Real Impact" */
@@ -815,7 +817,7 @@
   <article class="card" id="card-1" data-in="0.20" data-out="0.32">
     <div class="card-eyebrow">01 — Case Study</div>
     <h2>A Real Impact</h2>
-    <p class="subhead"><strong>8 Years of Epilepsy and Invasive Neurosurgery —</strong> now driven by an autonomous system that plans, tracks, and self-corrects.</p>
+    <p class="subhead"><strong>8 Years of Epilepsy and Invasive Neurosurgery —</strong> now my health is driven by an autonomous system that plans, tracks, and self-corrects.</p>
 
     <div class="tab-row" role="tablist">
       <button class="active" data-panel="p1-overview" type="button">Overview</button>
@@ -847,8 +849,11 @@
     <div class="tab-panel" id="p1-context">
       <div class="ctx-section">
         <h4>Why I built this</h4>
-        <p class="dense">Eight years of epilepsy taught me that <strong>anxiety is what bad planning feels like</strong>. I was burning my energy guessing — what to eat, when to train, whether tomorrow was a high-risk day — and never circling back to see what worked.</p>
-        <p class="dense">I tried prompting Claude on demand. It worked sometimes, but it was inconsistent and there was no continuity between sessions. The unlock was treating it like an <strong>autonomous system</strong>, not a chatbot — agents that own a job, write to shared state, and learn from their own history. The neurologist agent caught a hydration pattern after long runs I never would have flagged. The Whoop analyst found that meditation drives my deep sleep more than any other input. Insights I couldn't have surfaced by hand.</p>
+        <p class="dense">Eight years of epilepsy taught me that anxiety is what bad planning feels like — I was spending 90% of my energy guessing, and 10% acting on it. The unlock came when the agents started surfacing things I'd never have caught by hand:</p>
+        <ul class="insights" style="margin-top: 0; padding-top: 0; border-top: none;">
+          <li><strong>The neurologist agent flagged hydration drop-offs the day after long runs</strong> — a pattern I'd been missing for months that mapped directly to how I felt the next morning.</li>
+          <li><strong>The Whoop analyst found that meditation moved my deep sleep more than any other input</strong> — more than caffeine timing, more than screen time, more than bedtime itself.</li>
+        </ul>
       </div>
 
       <div class="ctx-section">
@@ -1242,7 +1247,7 @@
   // ---- Unified rAF: tilt + spotlight + ambient float + magnetic ----
   // All transform writes per element happen in one place to avoid races.
   let t0 = performance.now();
-  const TILT_MAX = 15;     // degrees
+  const TILT_MAX = 13;     // degrees (was 15, reduced ~2%)
   const TILT_SCALE = 1.04;
   const FLOAT_AMP = 8;     // pixels
   const FLOAT_PERIOD = 1.5; // matches sin(elapsed / 1.5) ~ 9.4s wave
