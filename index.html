@@ -258,13 +258,13 @@
     opacity: 0;
     padding: 44px 48px 40px;
     border-radius: 22px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(15, 22, 28, 0.55);
+    border: 1px solid rgba(255,255,255,0.18);
     box-shadow:
-      0 8px 32px rgba(0,0,0,0.30),
-      inset 0 1px 0 rgba(255,255,255,0.15);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    backdrop-filter: blur(20px) saturate(140%);
+      0 12px 40px rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+    -webkit-backdrop-filter: blur(28px) saturate(120%);
+    backdrop-filter: blur(28px) saturate(120%);
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -323,14 +323,14 @@
   .card p {
     font-size: 15px;
     line-height: 1.6;
-    font-weight: 300;
-    color: var(--white-2);
+    font-weight: 400;
+    color: #f4f4f4;
     margin-bottom: 16px;
   }
   .card p.dense {
     font-size: 14px;
     line-height: 1.65;
-    color: rgba(232, 232, 232, 0.92);
+    color: #f0f0f0;
   }
 
   /* tabs (Card 1) */
@@ -540,10 +540,10 @@
   .proj-row .blurb {
     grid-column: 1;
     grid-row: 2;
-    font-size: 12.5px;
-    color: rgba(232, 232, 232, 0.78);
-    line-height: 1.45;
-    font-weight: 300;
+    font-size: 13px;
+    color: #ebebeb;
+    line-height: 1.5;
+    font-weight: 400;
   }
   .proj-row.sub {
     padding: 8px 14px 8px 36px;
@@ -638,15 +638,18 @@
     padding: 32px 40px 28px;
     max-height: calc(100vh - 80px);
   }
-  /* Card 4 row blurb: takeaway sentence renders on its own line, sage-green */
+  /* Card 4 row blurb: takeaway sentence renders on its own line, white + sage marker */
   .proj-row .blurb { display: block; }
   .proj-row .blurb .takeaway {
     display: block;
-    color: var(--sage-bright);
+    color: #fff;
     font-weight: 500;
-    margin-top: 4px;
-    font-size: 12.5px;
+    margin-top: 6px;
+    padding-left: 10px;
+    border-left: 2px solid var(--sage-bright);
+    font-size: 13px;
     letter-spacing: 0.1px;
+    line-height: 1.45;
   }
 
   /* Card 1 subhead under "A Real Impact" */
