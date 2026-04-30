@@ -670,6 +670,61 @@
   /* Card 5 contact emphasis */
   .card.contact h2 { font-size: 38px; }
 
+  /* Card 4 — wider to keep project rows from spanning full viewport height */
+  .card#card-4 { width: 760px; }
+  .proj-row .blurb strong { color: #fff; font-weight: 600; }
+
+  /* Card 1 subhead under "A Real Impact" */
+  .card .subhead {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: rgba(232, 232, 232, 0.78);
+    letter-spacing: 0.3px;
+    line-height: 1.45;
+    margin: -8px 0 16px;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .card .subhead strong { color: #fff; font-style: normal; font-weight: 500; }
+
+  /* Context tab — "Why your company needs this" mini-grid */
+  .ctx-section { margin-bottom: 16px; }
+  .ctx-section h4 {
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--sage-bright);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .ctx-scenarios {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .ctx-scenario {
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-left: 3px solid var(--sage);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--white-2);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+  .ctx-scenario strong { color: #fff; font-weight: 500; }
+  .ctx-close {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.55;
+  }
+  .ctx-close strong { color: var(--sage-bright); font-weight: 500; }
+
   /* mobile fallback */
   @media (max-width: 768px) {
     .scroll-container { height: auto; }
@@ -760,15 +815,17 @@
   <article class="card" id="card-1" data-in="0.20" data-out="0.32">
     <div class="card-eyebrow">01 — Case Study</div>
     <h2>A Real Impact</h2>
+    <p class="subhead"><strong>8 Years of Epilepsy and Invasive Neurosurgery —</strong> now driven by an autonomous system that plans, tracks, and self-corrects.</p>
 
     <div class="tab-row" role="tablist">
       <button class="active" data-panel="p1-overview" type="button">Overview</button>
+      <button data-panel="p1-context" type="button">Context</button>
       <button data-panel="p1-demo" type="button">Ecosystem Demo</button>
       <button data-panel="p1-validator" type="button">Validator</button>
     </div>
 
     <div class="tab-panel active" id="p1-overview">
-      <p class="dense">Six autonomous agents — meal planner, training calendar, neurologist risk forecaster, Whoop analyst, Google Workspace operator, weekly orchestrator — running on a shared <em>pipeline-state.json</em> nervous system. Twenty-five-plus subagents handle parallel work. Calibration weights self-tune monthly through a retrospective validator that checks every forecast against real biometric outcomes.</p>
+      <p class="dense">For years, recovery from seizures meant spending <strong>90% of my time planning and 10% acting</strong> — with no real loop back to see what worked. So I built one. Six autonomous agents — meal planner, training calendar, neurologist risk forecaster, Whoop analyst, Google Workspace operator, weekly orchestrator — running on a shared <em>pipeline-state.json</em> nervous system. Twenty-five-plus subagents handle parallel work. Calibration weights self-tune monthly through a retrospective validator that checks every forecast against real biometric outcomes.</p>
 
       <div class="stats-grid">
         <div class="stat"><span class="num">126</span><span class="lbl">days of self-tracked signals</span></div>
@@ -784,6 +841,24 @@
           <li>Strength days yield <strong>+6% next-day recovery</strong> vs. run days; rest days redistributed accordingly</li>
           <li>Forecast-driven rest has cut overtraining flags and lifted average weekly training quality</li>
         </ul>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="p1-context">
+      <div class="ctx-section">
+        <h4>Why I built this</h4>
+        <p class="dense">Eight years of epilepsy taught me that <strong>anxiety is what bad planning feels like</strong>. I was burning my energy guessing — what to eat, when to train, whether tomorrow was a high-risk day — and never circling back to see what worked.</p>
+        <p class="dense">I tried prompting Claude on demand. It worked sometimes, but it was inconsistent and there was no continuity between sessions. The unlock was treating it like an <strong>autonomous system</strong>, not a chatbot — agents that own a job, write to shared state, and learn from their own history. The neurologist agent caught a hydration pattern after long runs I never would have flagged. The Whoop analyst found that meditation drives my deep sleep more than any other input. Insights I couldn't have surfaced by hand.</p>
+      </div>
+
+      <div class="ctx-section">
+        <h4>Why your company needs the same thing</h4>
+        <div class="ctx-scenarios">
+          <div class="ctx-scenario"><strong>Solo operator buried in 14 spreadsheets and one CRM.</strong> Your "data" is everywhere and nowhere. An agent pipeline pulls from each source nightly and gives you one source of truth.</div>
+          <div class="ctx-scenario"><strong>Founder with good metrics but no connections between them.</strong> You can see each number; you can't see the patterns. A self-calibrating analyst agent learns what predicts what — and surfaces what you'd never catch.</div>
+          <div class="ctx-scenario"><strong>A company with no website demonstrating what it can actually do.</strong> Pitch decks are a guess; live, working systems aren't. One agent build, deployed, becomes the proof.</div>
+        </div>
+        <p class="ctx-close">AI agents cut the planning tax. <strong>You spend your time on the work — not on figuring out what to do next.</strong></p>
       </div>
     </div>
 
@@ -888,7 +963,7 @@
           <span class="meta">· flagship · 6 agents · 25+ subagents</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">A multi-agent network that plans my training, food, and recovery every week — with zero manual handoffs. Why it matters: it proves the architecture works in production, not just on a slide.</span>
+        <span class="blurb">A multi-agent network that plans my training, food, and recovery every week — with zero manual handoffs. <strong>It proves the architecture works in production, not just on a slide.</strong></span>
       </a>
 
       <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/health-agent-map.html" target="_blank" rel="noopener">
@@ -896,7 +971,7 @@
           <span class="meta">· interactive SVG flow</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Click any agent to expand its role, inputs, and outputs. Built so anyone can see exactly how the network reasons step-by-step.</span>
+        <span class="blurb">Click any agent to expand its role, inputs, and outputs. <strong>Built so anyone can see exactly how the network reasons step-by-step.</strong></span>
       </a>
 
       <a class="proj-row sub" href="https://loganmatson.github.io/health-agent-ecosystem/outputs/validator-dashboard/" target="_blank" rel="noopener">
@@ -904,7 +979,7 @@
           <span class="meta">· monthly accuracy tracker</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Every forecast checked against real biometrics. Drift gets pushed back into the system — the whole pipeline gets sharper on its own.</span>
+        <span class="blurb">Every forecast checked against real biometrics. <strong>Drift gets pushed back into the system — the whole pipeline gets sharper on its own.</strong></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/marathon-plan.html" target="_blank" rel="noopener">
@@ -912,7 +987,7 @@
           <span class="meta">· cartographic 7-zone race plan</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Race-day pacing strategy, nutrition windows, and elevation-aware tactics for all 26.2 miles. Why it matters: turns a generic training app into a custom tactical brief.</span>
+        <span class="blurb">Race-day pacing strategy, nutrition windows, and elevation-aware tactics for all 26.2 miles. <strong>Turns a generic training app into a custom tactical brief.</strong></span>
       </a>
 
       <!-- TODO: link to monthly Whoop PDF once GitHub Pages route is set (loganmatson.github.io/health-agent-ecosystem/outputs/whoop/...) -->
@@ -921,7 +996,7 @@
           <span class="meta">· monthly analyst PDF · 1,500+ data points</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Auto-generated each month from raw Whoop CSVs — sleep, strain, recovery, behavioral correlations. Why it matters: the same pipeline works for any time-series data, not just biometrics.</span>
+        <span class="blurb">Auto-generated each month from raw Whoop CSVs — sleep, strain, recovery, behavioral correlations. <strong>The same pipeline works for any time-series data, not just biometrics.</strong></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/skill-portfolio.html" target="_blank" rel="noopener">
@@ -929,7 +1004,7 @@
           <span class="meta">· 30+ skill empire · self-managing</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Live index of every reusable capability my agents draw from — created, audited, and rotated automatically. Why it matters: shows how a system can curate itself without me touching it.</span>
+        <span class="blurb">Live index of every reusable capability my agents draw from — created, audited, and rotated automatically. <strong>Shows how a system can curate itself without me touching it.</strong></span>
       </a>
 
       <a class="proj-row" href="https://loganmatson.github.io/logan-portfolio/scotland.html" target="_blank" rel="noopener">
@@ -937,7 +1012,7 @@
           <span class="meta">· 9-day interactive trip planner</span>
         </span>
         <span class="arrow">→</span>
-        <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links — all in one HTML file. Why it matters: same pattern works for any complex personal logistics, not just travel.</span>
+        <span class="blurb">Hike toggles, packing checklists, real bookings, 50+ deep links — all in one HTML file. <strong>Same pattern works for any complex personal logistics, not just travel.</strong></span>
       </a>
 
     </div>
